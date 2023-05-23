@@ -3,6 +3,17 @@
   "version": "0.1.0",
   "description": "Бэкенд проекта Место. Учебный проект Яндекс.Практикума",
   "main": "app.js",
+  "keywords": ["yandex-praktikum"],
+  "author": "Denis Zыkov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Denis-Deonis/express-mesto-gha/issues"
+  },
+  "homepage": "https://github.com/Denis-Deonis/express-mesto-gha#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Denis-Deonis/express-mesto-gha.git"
+  },
   "scripts": {
     "lint": "npx eslint .",
     "start": "node app.js",
@@ -27,8 +38,5 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "validator": "^13.9.0"
-  },
-  "keywords": ["yandex-praktikum"],
-  "author": "Denis Zыkov",
-  "license": "ISC"
+  }
 }
