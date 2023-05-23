@@ -27,5 +27,8 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "validator": "^13.9.0"
-  }
+  },
+  "keywords": ["yandex-praktikum"],
+  "author": "Denis Zыkov",
+  "license": "ISC"
 }
