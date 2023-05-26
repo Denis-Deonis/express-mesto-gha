@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "description": "Бэкенд проекта Место. Учебный проект Яндекс.Практикума",
   "main": "app.js",
-  "keywords": ["yandex-praktikum"],
+  "keywords": [
+    "yandex-praktikum"
+  ],
   "author": "Denis Zыkov",
   "license": "ISC",
   "bugs": {
@@ -37,7 +39,7 @@
     "express-rate-limit": "^6.7.0",
     "helmet": "^6.1.5",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.1.0",
+    "mongoose": "^7.2.1",
     "validator": "^13.9.0"
   }
 }
