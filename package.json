@@ -15,7 +15,8 @@
     "url": "git+https://github.com/Denis-Deonis/express-mesto-gha.git"
   },
   "scripts": {
-    "lint": "npx eslint .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "start": "node app.js",
     "dev": "nodemon app.js"
   },
