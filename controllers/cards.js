@@ -2,7 +2,7 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.send(cards))
     .catch((err) => res.status(500).send({
       message: 'Произошла ошибка при запросе карточек',
       err: err.message,
@@ -36,21 +36,27 @@ module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndRemove(cardId)
     .orFail()
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.send(card))
     .catch((err) => {
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(404).send({
+          message: 'Карточка c указанным id не найдена',
+          err: err.message,
+          stack: err.stack,
+        });
+      }
       if (err.name === 'CastError') {
         res.status(400).send({
           message: 'Переданы некорректные данные при попытке удалении карточки',
           err: err.message,
           stack: err.stack,
         });
-      } else {
-        res.status(500).send({
-          message: 'Внутренняя ошибка сервера',
-          err: err.message,
-          stack: err.stack,
-        });
       }
+      return res.status(500).send({
+        message: 'Внутренняя ошибка сервера',
+        err: err.message,
+        stack: err.stack,
+      });
     });
 };
 
@@ -64,16 +70,14 @@ module.exports.toggleLike = (req, res, isLiked = true) => {
     { new: true },
   )
     .orFail()
-    .then((card) => res.status(200).send(card))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(404)
-          .send({
-            message: 'Карточка c указанным id не найдена',
-            err: err.message,
-            stack: err.stack,
-          });
+        return res.status(404).send({
+          message: 'Карточка c указанным id не найдена',
+          err: err.message,
+          stack: err.stack,
+        });
       }
       if (err.name === 'CastError') {
         return res.status(400).send({
@@ -83,12 +87,10 @@ module.exports.toggleLike = (req, res, isLiked = true) => {
           stack: err.stack,
         });
       }
-      return res
-        .status(500)
-        .send({
-          message: 'Внутренняя ошибка сервера',
-          err: err.message,
-          stack: err.stack,
-        });
+      return res.status(500).send({
+        message: 'Внутренняя ошибка сервера',
+        err: err.message,
+        stack: err.stack,
+      });
     });
 };
