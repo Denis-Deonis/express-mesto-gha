@@ -46,7 +46,7 @@ module.exports.deleteCard = (req, res) => {
         });
       }
       if (err.name === 'CastError') {
-        res.status(400).send({
+        return res.status(400).send({
           message: 'Переданы некорректные данные при попытке удалении карточки',
           err: err.message,
           stack: err.stack,
