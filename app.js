@@ -1,31 +1,30 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const helmet = require('helmet');
+const express = require('express')
+const mongoose = require('mongoose')
+const helmet = require('helmet')
+const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
+const { errors } = require('celebrate')
+const errorHandler = require('./middlewares/errorHandler')
 
-const routes = require('./routes/router');
+const routes = require('./routes/router')
 
-const { PORT = 3000 } = process.env;
-const app = express();
+const { PORT = 3000, DB_PATH = 'mongodb://127.0.0.1:27017/mestodb' } =
+  process.env
 
-app.use(helmet());
-app.use(express.json());
-app.use(routes);
+const app = express()
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '644d84b3510b35d67681b07f',
-  };
-  next();
-});
+app.use(helmet())
+app.use(bodyParser.json())
+app.use(cookieParser())
+app.use(express.json())
+app.use(routes)
+app.use(errors())
+app.use(errorHandler)
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb')
-  .then(() => {
-    console.log('БД подключена');
-  })
-  .catch(() => {
-    console.log('Не удалось подключиться к БД');
-  });
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+mongoose
+  .connect(DB_PATH )
+  .then(() => console.log('БД подключена'))
+  .catch(() => console.log('Не удалось подключиться к БД'))
+
+app.listen(PORT, () => console.log(`App listening on port ${PORT}`))
