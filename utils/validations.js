@@ -48,21 +48,21 @@ const validationCreateUser = celebrate({
   }),
 })
 
-const validationUpdateUser = celebrate({
+const validationUpdateProfile = celebrate({
   body: Joi.object().keys({
     name: Joi.string()
       .required()
       .min(2)
       .max(30)
       .message(
-        'Информация о пользователе должна быть заполнена и содержать от 2 и до 30 символов'
+        'Информация о пользователе должна быть заполнена и содержать от 2 до 30 символов'
       ),
     about: Joi.string()
       .required()
       .min(2)
       .max(30)
       .message(
-        'Информация о пользователе должна быть заполнена и содержать от 2 и до 30 символов'
+        'Информация о пользователе должна быть заполнена и содержать от 2 до 30 символов'
       ),
   }),
 })
@@ -82,6 +82,6 @@ module.exports = {
   validationUrl,
   validationLogin,
   validationCreateUser,
-  validationUpdateUser,
+  validationUpdateProfile,
   validationUpdateAvatar,
 }
