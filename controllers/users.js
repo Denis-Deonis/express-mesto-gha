@@ -1,126 +1,83 @@
-const User = require('../models/user');
+const User = require('../models/user')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const {SECRET_SIGNING_KEY} = require('../utils/constants')
+const { handleError } = require('../utils/errors')
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => res.status(500).send({ message: 'Внутренняя ошибка сервера' }));
-};
+    .catch(() => handleError(err, next))
+}
 
-module.exports.getUser = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+module.exports.getUser = (req, res, next) => {
+  const { userId } = req.params
+  return User.findById(userId)
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные при поиске пользователя',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
+    .catch(() => handleError(err, next))
+}
 
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({
-          message: 'Пользователь c указанным _id не найден',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
+module.exports.createUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body
+  return bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({ name, about, avatar, email, password: hash })
+    )
+    .then((user) =>
+      res.status(201).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      })
+    )
+    .catch((err) => handleError(err, next))
+}
 
-      return res.status(500).send({
-        message: 'Внутренняя ошибка сервера',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
-};
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => handleError(err, next))
+}
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({
-          message: 'Переданы некорректные данные при создании пользователя.',
-          err: err.message,
-          stack: err.stack,
-        });
-      } else {
-        res.status(500).send({
-          message: 'Внутренняя ошибка сервера',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
-    });
-};
+module.exports.loginUser = (req, res, next) => {
+  const { email, password } = req.body
+  return User.findUserByCredentials(email, password)
+  .then((user) => {
+    const token = jwt.sign({ _id: user._id }, SECRET_SIGNING_KEY, { expiresIn: '7d' });
+    res.cookie('jwt', token, {
+      maxAge: 3600000 * 24 * 7,
+      httpOnly: true,
+      sameSite: true,
+    })
+    .send({ message: `С возвращением, ${user.name}` })
+  })
+  .catch((err) => handleError(err, next))
+}
 
-module.exports.updateProfile = (req, res) => {
-  const { name, about } = req.body;
-  User.findByIdAndUpdate(
+module.exports.updateProfile = (req, res, next) => {
+  const { name, about } = req.body
+  return User.findByIdAndUpdate(
     req.user._id,
     { name, about },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении профиля',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
+    .catch((err) => handleError(err, next))
+}
 
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({
-          message: 'Пользователь не найден',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
-
-      return res.status(500).send({
-        message: 'Внутренняя ошибка сервера',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
-};
-
-module.exports.updateAvatar = (req, res) => {
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(
+module.exports.updateAvatar = (req, res, next) => {
+  const { avatar } = req.body
+  return User.findByIdAndUpdate(
     req.user._id,
     { avatar },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .orFail()
     .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'CastError' || err.name === 'ValidationError') {
-        return res.status(400).send({
-          message: 'Переданы некорректные данные при обновлении аватара',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
-
-      if (err.name === 'DocumentNotFoundError') {
-        return res.status(404).send({
-          message: 'Пользователь не найден',
-          err: err.message,
-          stack: err.stack,
-        });
-      }
-
-      return res.status(500).send({
-        message: 'Внутренняя ошибка сервера',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
-};
+    .catch((err) => handleError(err, next))
+}
