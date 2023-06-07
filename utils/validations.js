@@ -1,7 +1,8 @@
-const { celebrate, Joi } = require('celebrate');
-const { BAD_REQUEST, StatusCodeError } = require('./errors');
+const { celebrate, Joi } = require('celebrate')
+const { BAD_REQUEST, StatusCodeError } = require('./errors')
 
-const isURL =  /^(https?:\/\/)(www\.)?(?!-)[-a-zA-Z0-9@:%._~#=]{1,249}(?<!-)\.[A-Za-z]{2,6}([-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]*)#?$/;
+const isURL =
+  /^(https?:\/\/)(www\.)?(?!-)[-a-zA-Z0-9@:%._~#=]{1,249}(?<!-)\.[A-Za-z]{2,6}([-a-zA-Z0-9._~:/?#[\]@!$&'()*+,;=]*)#?$/
 
 const validationUrl = (url) => {
   if (isURL.test(url)) {
@@ -23,8 +24,64 @@ const validationLogin = celebrate({
   }),
 })
 
+const validationId = (schema = 'cardId') => {
+  celebrate({
+    params: Joi.object().keys({
+      [schema]: Joi.string().required().hex().length(24),
+    }),
+  })
+}
+
+const validationCreateUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(validationUrl),
+    email: Joi.string()
+      .required()
+      .email()
+      .message('Поле email должно быть заполнено'),
+    password: Joi.string()
+      .required()
+      .min(4)
+      .message('Поле пароль должно быть заполнено'),
+  }),
+})
+
+const validationUpdateUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string()
+      .required()
+      .min(2)
+      .max(30)
+      .message(
+        'Информация о пользователе должна быть заполнена и содержать от 2 и до 30 символов'
+      ),
+    about: Joi.string()
+      .required()
+      .min(2)
+      .max(30)
+      .message(
+        'Информация о пользователе должна быть заполнена и содержать от 2 и до 30 символов'
+      ),
+  }),
+})
+
+const validationUpdateAvatar = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string()
+      .required()
+      .custom(validationUrl)
+      .message('Введите корректный URL картинки'),
+  }),
+})
+
 module.exports = {
   isURL,
+  validationId,
   validationUrl,
   validationLogin,
+  validationCreateUser,
+  validationUpdateUser,
+  validationUpdateAvatar,
 }
