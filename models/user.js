@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
-const { isURL } = require('../utils/validations')
-const bcrypt = require('bcryptjs')
-const { UNAUTHORIZED, StatusCodeError } = require('../utils/errors')
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const { isURL } = require('../utils/validations');
+const { UNAUTHORIZED, StatusCodeError } = require('../utils/errors');
 
 const userSchema = new mongoose.Schema(
   {
@@ -57,25 +57,25 @@ const userSchema = new mongoose.Schema(
               return Promise.reject(
                 new StatusCodeError(
                   UNAUTHORIZED,
-                  'Неверный адрес электронной почты или пароль'
-                )
-              )
+                  'Неверный адрес электронной почты или пароль',
+                ),
+              );
             }
             return bcrypt.compare(password, user.password).then((matched) => {
               if (!matched) {
                 return Promise.reject(
                   new StatusCodeError(
                     UNAUTHORIZED,
-                    'Неверный адрес электронной почты или пароль'
-                  )
-                )
+                    'Неверный адрес электронной почты или пароль',
+                  ),
+                );
               }
-              return user
-            })
-          })
+              return user;
+            });
+          });
       },
     },
-  }
-)
+  },
+);
 
-module.exports = mongoose.model('user', userSchema)
+module.exports = mongoose.model('user', userSchema);
