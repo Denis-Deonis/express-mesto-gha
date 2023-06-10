@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/errorHandler');
+const authLimiter = require('./middlewares/rateLimiter');
 
 const routes = require('./routes/router');
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(routes);
 app.use(errors());
 app.use(errorHandler);
+app.use(authLimiter);
 
 mongoose
   .connect(DB_PATH)
