@@ -23,13 +23,11 @@ const validationLogin = celebrate({
   }),
 });
 
-const validationId = (schema = 'cardId') => {
-  celebrate({
-    params: Joi.object().keys({
-      [schema]: Joi.string().required().hex().length(24),
-    }),
-  });
-};
+const validationId = (schema = 'cardId') => celebrate({
+  params: Joi.object().keys({
+    [schema]: Joi.string().required().hex().length(24),
+  }),
+});
 
 const validationCreateUser = celebrate({
   body: Joi.object().keys({
@@ -54,14 +52,14 @@ const validationUpdateProfile = celebrate({
       .min(2)
       .max(30)
       .message(
-        'Информация о пользователе должна быть заполнена и содержать от 2 до 30 символов',
+        'Имя пользователя должно быть заполнено и содержать не менее 2 и не более 30 миволов'
       ),
     about: Joi.string()
       .required()
       .min(2)
       .max(30)
       .message(
-        'Информация о пользователе должна быть заполнена и содержать от 2 до 30 символов',
+        'Информация о пользователе должна быть заполнена и содержать не менее 2 и не более 30 миволов'
       ),
   }),
 });
